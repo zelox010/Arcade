@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Fabulous Arcade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ffff;
+            --secondary: #ff00ff;
+            --background: #1a1a2e;
+            --text: #ffffff;
+            --card-bg: #16213e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px var(--primary), 0 0 10px var(--secondary);
+            }
+            to {
+                text-shadow: 0 0 10px var(--primary), 0 0 20px var(--secondary), 0 0 30px var(--primary);
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .coin-display {
+            background-color: #ffd700;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-right: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .coin-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotateY(360deg); }
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        main {
+            padding-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .game-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--primary), transparent 30%);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-area {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        /* Memory Game Styles */
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            perspective: 1000px;
+        }
+
+        .memory-card {
+            width: 100%;
+            height: 120px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+        }
+
+        .memory-card.flip {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card .front,
+        .memory-card .back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border-radius: 5px;
+        }
+
+        .memory-card .front {
+            background-color: var(--primary);
+            transform: rotateY(180deg);
+        }
+
+        .memory-card .back {
+            background-color: var(--secondary);
+        }
+
+        /* Whack-a-Mole Styles */
+        .whack-a-mole {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .mole-hole {
+            width: 100%;
+            padding-top: 100%;
+            background-color: #4a4a4a;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mole {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23brown"/><circle cx="35" cy="40" r="5" fill="%23black"/><circle cx="65" cy="40" r="5" fill="%23black"/><path d="M 40 60 Q 50 70 60 60" stroke="%23black" stroke-width="3" fill="none"/></svg>');
+            background-size: cover;
+            transition: bottom 0.1s;
+            cursor: pointer;
+        }
+
+        .mole.hidden {
+            bottom: -100%;
+        }
+
+        /* Snake Game Styles */
+        #snake-game {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #4a4a4a;
+            position: relative;
+        }
+
+        .snake-segment {
+            position: absolute;
+            width: 5%;
+            height: 5%;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        .snake-food {
+            position: absolute;
+            width: 5%;
+            height: 5%;
+            background-color: var(--secondary);
+            border-radius: 50%;
+        }
+
+        /* Shop Styles */
+        .shop {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .shop-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .shop-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: var(--text);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-selection {
+                grid-template-columns: 1fr;
+            }
+
+            .memory-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .whack-a-mole {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Particle effect */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        /* Username Input Styles */
+        #username-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        #username {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--card-bg);
+            color: var(--text);
+            text-align: center;
+        }
+
+        #username:focus {
+            outline: 2px solid var(--primary);
+        }
+
+        /* Game Area Styles */
+        #game-area h2 {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-family: 'Press Start 2P', cursive;
+            color: var(--primary);
+        }
+
+        #game-area p {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Leaderboard Styles */
+        #leaderboard-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #leaderboard-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #leaderboard-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <header>
+        <nav class="container">
+            <div class="logo">Fabulous Arcade</div>
+            <div class="user-info">
+                <div class="coin-display">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffd700'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23000000'>$</text></svg>" alt="Coin" class="coin-icon">
+                    <span id="coin-count">0</span>
+                </div>
+                <div class="avatar" id="user-avatar">G</div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Welcome to Fabulous Arcade</h1>
+        <div id="username-input">
+            <input type="text" id="username" placeholder="Enter your username" maxlength="10">
+            <button class="btn" onclick="setUsername()">Start Playing</button>
+        </div>
+        <div id="game-selection" class="game-selection" style="display: none;">
+            <div class="game-card" onclick="startGame('memory')">
+                <div class="game-icon">🃏</div>
+                <h3>Memory Game</h3>
+                <p>High Score: <span id="memory-high-score">0</span></p>
+            </div>
+            <div class="game-card" onclick="startGame('whack-a-mole')">
+                <div class="game-icon">🐹</div>
+                <h3>Whack-a-Mole</h3>
+                <p>High Score: <span id="whack-high-score">0</span></p>
+            </div>
+            <div class="game-card" onclick="startGame('snake')">
+                <div class="game-icon">🐍</div>
+                <h3>Snake Game</h3>
+                <p>High Score: <span id="snake-high-score">0</span></p>
+            </div>
+        </div>
+        <div id="game-area" class="game-area" style="display: none;"></div>
+        <div id="shop" class="shop" style="display: none;">
+            <div class="shop-item">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ff0000'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff'>♥</text></svg>" alt="Extra Life">
+                <h3>Extra Life</h3>
+                <p>Price: 50 coins</p>
+                <button class="btn" onclick="buyItem('extra-life', 50)">Buy</button>
+            </div>
+            <div class="shop-item">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2300ff00'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff'>⏱</text></svg>" alt="Time Boost">
+                <h3>Time Boost</h3>
+                <p>Price: 30 coins</p>
+                <button class="btn" onclick="buyItem('time-boost', 30)">Buy</button>
+            </div>
+            <div class="shop-item">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffd700'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23ffffff'>★</text></svg>" alt="Golden Avatar">
+                <h3>Golden Avatar</h3>
+                <p>Price: 100 coins</p>
+                <button class="btn" onclick="buyItem('golden-avatar', 100)">Buy</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <button class="btn" onclick="toggleShop()">Shop</button>
+        <button class="btn" onclick="toggleLeaderboard()">Leaderboard</button>
+        <button class="btn" onclick="toggleAudio()">Toggle Audio</button>
+    </footer>
+
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleLeaderboard()">&times;</span>
+            <h2>Leaderboard</h2>
+            <ul id="leaderboard-list"></ul>
+        </div>
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="https://example.com/background-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Particle.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                move: { enable: true, speed: 2, direction: "none", random: true, out_mode: "out" }
+            }
+        });
+
+        let username = '';
+        let coins = 0;
+        let highScores = { memory: 0, 'whack-a-mole': 0, snake: 0 };
+        let ownedItems = [];
+        let isMuted = false;
+
+        function setUsername() {
+            username = document.getElementById('username').value;
+            if (username) {
+                document.getElementById('username-input').style.display = 'none';
+                document.getElementById('game-selection').style.display = 'grid';
+                document.getElementById('user-avatar').innerText = username[0].toUpperCase();
+                loadUserData();
+            }
+        }
+
+        function loadUserData() {
+            const savedCoins = localStorage.getItem('coins');
+            const savedHighScores = localStorage.getItem('highScores');
+            const savedOwnedItems = localStorage.getItem('ownedItems');
+
+            if (savedCoins) coins = parseInt(savedCoins);
+            if (savedHighScores) highScores = JSON.parse(savedHighScores);
+            if (savedOwnedItems) ownedItems = JSON.parse(savedOwnedItems);
+
+            updateUI();
+        }
+
+        function saveUserData() {
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('highScores', JSON.stringify(highScores));
+            localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
+        }
+
+        function updateUI() {
+            document.getElementById('coin-count').innerText = coins;
+            document.getElementById('memory-high-score').innerText = highScores.memory;
+            document.getElementById('whack-high-score').innerText = highScores['whack-a-mole'];
+            document.getElementById('snake-high-score').innerText = highScores.snake;
+
+            if (ownedItems.includes('golden-avatar')) {
+                document.getElementById('user-avatar').style.backgroundColor = 'gold';
+            }
+        }
+
+        function startGame(game) {
+            document.getElementById('game-selection').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('game-area').innerHTML = `<h2>${game.charAt(0).toUpperCase() + game.slice(1)}</h2>`;
+
+            switch (game) {
+                case 'memory':
+                    initMemoryGame();
+                    break;
+                case 'whack-a-mole':
+                    initWhackAMole();
+                    break;
+                case 'snake':
+                    initSnakeGame();
+                    break;
+            }
+        }
+
+        function endGame(game, score) {
+            const earnedCoins = Math.floor(score / 10);
+            coins += earnedCoins;
+            if (score > highScores[game]) {
+                highScores[game] = score;
+            }
+            saveUserData();
+            updateUI();
+            alert(`Game Over! You scored ${score} points and earned ${earnedCoins} coins!`);
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-selection').style.display = 'grid';
+        }
+
+        function initMemoryGame() {
+            const emojis = ['🎮', '🕹️', '🎲', '🃏', '🎳', '🏓', '🎯', '🎰'];
+            const gameEmojis = [...emojis, ...emojis];
+            gameEmojis.sort(() => 0.5 - Math.random());
+
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML += `
+                <div class="memory-game">
+                    ${gameEmojis.map((emoji, index) => `
+                        <div class="memory-card" data-emoji="${emoji}">
+                            <div class="front">${emoji}</div>
+                            <div class="back">?</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            let hasFlippedCard = false;
+            let lockBoard = false;
+            let firstCard, secondCard;
+            let matches = 0;
+            let moves = 0;
+
+            function flipCard() {
+                if (lockBoard) return;
+                if (this === firstCard) return;
+
+                this.classList.add('flip');
+
+                if (!hasFlippedCard) {
+                    hasFlippedCard = true;
+                    firstCard = this;
+                    return;
+                }
+
+                secondCard = this;
+                checkForMatch();
+            }
+
+            function checkForMatch() {
+                moves++;
+                let isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+                isMatch ? disableCards() : unflipCards();
+            }
+
+            function disableCards() {
+                firstCard.removeEventListener('click', flipCard);
+                secondCard.removeEventListener('click', flipCard);
+                matches++;
+                if (matches === emojis.length) {
+                    setTimeout(() => endGame('memory', Math.floor(1000 * (emojis.length / moves))), 1000);
+                }
+                resetBoard();
+            }
+
+            function unflipCards() {
+                lockBoard = true;
+                setTimeout(() => {
+                    firstCard.classList.remove('flip');
+                    secondCard.classList.remove('flip');
+                    resetBoard();
+                }, 1500);
+            }
+
+            function resetBoard() {
+                [hasFlippedCard, lockBoard] = [false, false];
+                [firstCard, secondCard] = [null, null];
+            }
+
+            document.querySelectorAll('.memory-card').forEach(card => card.addEventListener('click', flipCard));
+        }
+
+        function initWhackAMole() {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML += `
+                <div class="whack-a-mole">
+                    ${Array(9).fill().map((_, i) => `
+                        <div class="mole-hole">
+                            <div class="mole hidden"></div>
+                        </div>
+                    `).join('')}
+                </div>
+                <p>Score: <span id="whack-score">0</span></p>
+                <p>Time: <span id="whack-time">30</span></p>
+            `;
+
+            const moles = document.querySelectorAll('.mole');
+            const scoreDisplay = document.getElementById('whack-score');
+            const timeDisplay = document.getElementById('whack-time');
+            let score = 0;
+            let timeLeft = 30;
+            let gameTimer;
+
+            function randomTime(min, max) {
+                return Math.round(Math.random() * (max - min) + min);
+            }
+
+            function randomMole(moles) {
+                const idx = Math.floor(Math.random() * moles.length);
+                const mole = moles[idx];
+                return mole;
+            }
+
+            function peep() {
+                const time = randomTime(500, 1000);
+                const mole = randomMole(moles);
+                mole.classList.remove('hidden');
+                setTimeout(() => {
+                    mole.classList.add('hidden');
+                    if (timeLeft > 0) peep();
+                }, time);
+            }
+
+            function startGame() {
+                scoreDisplay.textContent = 0;
+                timeLeft = 30;
+                score = 0;
+                peep();
+                gameTimer = setInterval(() => {
+                    timeLeft--;
+                    timeDisplay.textContent = timeLeft;
+                    if (timeLeft === 0) {
+                        clearInterval(gameTimer);
+                        endGame('whack-a-mole', score);
+                    }
+                }, 1000);
+            }
+
+            function whack(e) {
+                if (!e.isTrusted) return;
+                score++;
+                this.classList.add('hidden');
+                scoreDisplay.textContent = score;
+            }
+
+            moles.forEach(mole => mole.addEventListener('click', whack));
+            startGame();
+        }
+
+        function initSnakeGame() {
+            const gameArea = document.getElementById('game-area');
+            gameArea.innerHTML += `
+                <div id="snake-game"></div>
+                <p>Score: <span id="snake-score">0</span></p>
+            `;
+
+            const gameBoard = document.getElementById('snake-game');
+            const scoreDisplay = document.getElementById('snake-score');
+            const gridSize = 20;
+            let snake = [{ x: 10, y: 10 }];
+            let food = { x: 15, y: 15 };
+            let dx = 1;
+            let dy = 0;
+            let score = 0;
+            let gameLoop;
+
+            function drawGame() {
+                gameBoard.innerHTML = '';
+                drawSnake();
+                drawFood();
+            }
+
+            function drawSnake() {
+                snake.forEach(segment => {
+                    const snakeElement = document.createElement('div');
+                    snakeElement.style.left = segment.x * 5 + '%';
+                    snakeElement.style.top = segment.y * 5 + '%';
+                    snakeElement.classList.add('snake-segment');
+                    gameBoard.appendChild(snakeElement);
+                });
+            }
+
+            function drawFood() {
+                const foodElement = document.createElement('div');
+                foodElement.style.left = food.x * 5 + '%';
+                foodElement.style.top = food.y * 5 + '%';
+                foodElement.classList.add('snake-food');
+                gameBoard.appendChild(foodElement);
+            }
+
+            function moveSnake() {
+                const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+                snake.unshift(head);
+                if (head.x === food.x && head.y === food.y) {
+                    score++;
+                    scoreDisplay.textContent = score;
+                    generateFood();
+                } else {
+                    snake.pop();
+                }
+            }
+
+            function generateFood() {
+                food.x = Math.floor(Math.random() * gridSize);
+                food.y = Math.floor(Math.random() * gridSize);
+            }
+
+            function checkCollision() {
+                const head = snake[0];
+                if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+                    clearInterval(gameLoop);
+                    endGame('snake', score);
+                }
+                for (let i = 1; i < snake.length; i++) {
+                    if (head.x === snake[i].x && head.y === snake[i].y) {
+                        clearInterval(gameLoop);
+                        endGame('snake', score);
+                    }
+                }
+            }
+
+            document.addEventListener('keydown', (e) => {
+                switch (e.key) {
+                    case 'ArrowUp': if (dy === 0) { dx = 0; dy = -1; } break;
+                    case 'ArrowDown': if (dy === 0) { dx = 0; dy = 1; } break;
+                    case 'ArrowLeft': if (dx === 0) { dx = -1; dy = 0; } break;
+                    case 'ArrowRight': if (dx === 0) { dx = 1; dy = 0; } break;
+                }
+            });
+
+            function gameStep() {
+                moveSnake();
+                checkCollision();
+                drawGame();
+            }
+
+            gameLoop = setInterval(gameStep, 200);
+            drawGame();
+        }
+
+        function toggleShop() {
+            const shopElement = document.getElementById('shop');
+            if (shopElement.style.display === 'none') {
+                document.getElementById('game-selection').style.display = 'none';
+                document.getElementById('game-area').style.display = 'none';
+                shopElement.style.display = 'grid';
+            } else {
+                shopElement.style.display = 'none';
+                document.getElementById('game-selection').style.display = 'grid';
+            }
+        }
+
+        function buyItem(item, price) {
+            if (coins >= price && !ownedItems.includes(item)) {
+                coins -= price;
+                ownedItems.push(item);
+                saveUserData();
+                updateUI();
+                alert(`You bought ${item}!`);
+            } else if (ownedItems.includes(item)) {
+                alert('You already own this item!');
+            } else {
+                alert('Not enough coins!');
+            }
+        }
+
+        function toggleLeaderboard() {
+            const modal = document.getElementById('leaderboard-modal');
+            if (modal.style.display === 'none') {
+                updateLeaderboard();
+                modal.style.display = 'block';
+            } else {
+                modal.style.display = 'none';
+            }
+        }
+
+        function updateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '';
+            for (const [game, score] of Object.entries(highScores)) {
+                const li = document.createElement('li');
+                li.textContent = `${game}: ${score}`;
+                leaderboardList.appendChild(li);
+            }
+        }
+
+        function toggleAudio() {
+            const backgroundMusic = document.getElementById('background-music');
+            if (isMuted) {
+                backgroundMusic.play();
+                isMuted = false;
+            } else {
+                backgroundMusic.pause();
+                isMuted = true;
+            }
+        }
+
+        // Initialize the game
+        updateUI();
+    </script>
+</body>
+</html>
